@@ -21,18 +21,17 @@ def transMonth():
 def setup():
     global img, scrollX, setTime, chInfo, profileBg, profileLeftBg
     global monthList
+    global clickSave
         
     size(1280, 720)
     
-    img = loadImage("./images/sandStorm.png")
-    profileBg = loadImage("./images/sandBg.png")
+    img           = loadImage("./images/sandStorm.png")
+    profileBg     = loadImage("./images/sandBg.png")
     profileLeftBg = loadImage("./images/myProfileTicket.png")
-    scrollX = -500
-    setTime = 0
     
+    clickSave = False
     monthList = transMonth()
-    
-    chInfo = getCharacterInfo()
+    chInfo    = getCharacterInfo()
 
 
 # get actor's SD Image and background color
@@ -66,43 +65,46 @@ def getCharacterInfo():
     }
     
     return info
-    
+
+## get text width
+def getTextWidth(word):
+    return int(textWidth(word))
 
 def draw():
     global setTime
     background(255)
     
-    ## load to sand storm
-    if (setTime <= 60):
-        loadSandStorm()
-        setTime += 1
-    
-    selectMyActor('yumla')
-    
-
-# sand storm
-def loadSandStorm():
-    global scrollX
-    scrollX += 3
-    image(img, scrollX, 0, 2400, 1200)
+    # show my actor ticket page
+    selectMyActor('ganglim', 'ar.kwon')
 
 
 # show my actor
-def selectMyActor(actor):
+def selectMyActor(actor, userName):
     global chInfo, profileBg, profileLeftBg
-    global monthList
+    global nowTime
+    global clickSave
     
-    actorInfo = chInfo[actor]
-    nowTime = datetime.now()
-    
-    if not actorInfo:
+    if not chInfo[actor]:
         return
     
-    image(profileBg, 0, 0)
+    nowTime = datetime.now()
     
+    image(profileBg, 0, 0)
     image(profileLeftBg, 0, 0)
     
-    ### left ###
+    setMyActorTicket()
+    setMyActorProfile(actor, userName)
+    
+    if not clickSave:
+        textSize(24)
+        fill(255)
+        text("SAVE", width / 4 * 3 - getTextWidth("SAVE") / 2, height - 40)
+    else:
+        clickSave = False
+        save("myProfile.jpg")
+
+def setMyActorTicket():
+    global monthList, nowTime
     
     ## date time
     posterText = """
@@ -116,25 +118,38 @@ def selectMyActor(actor):
     """
     
     transMonth = monthList[nowTime.strftime("%m")]
+    if int(nowTime.strftime("%H")) >= 12:
+        localeType = "PM"
+    else:
+        localeType = "AM"
     
+    fill(0)
     textSize(18)
-    text(posterText % (transMonth, nowTime.strftime("%d. %Y"), nowTime.strftime("%I%p")), 40, 150)
+    text(posterText % (transMonth, nowTime.strftime("%d. %Y"), "%s%s" % (nowTime.strftime("%I"), localeType)), 40, 140)
     
     ## month and year
-    textSize(40)
-    text("%s %s" % (transMonth, nowTime.strftime("%Y")), 150, height - 150)
+    textSize(42)
+    text("%s %s" % (transMonth, nowTime.strftime("%Y")), 115, height - 115)
     
-    ### right ### 
+def setMyActorProfile(actor, userName):
+    global chInfo
+    
+    actorInfo = chInfo[actor]
+    
+    nowName = actorInfo["name"]
+    nowImg  = actorInfo["SDImg"]
+    nowBg   = actorInfo["bg"]
+    
     circleW = 300
-    sdImg = loadImage(actorInfo["SDImg"])
-    sdX = width / 4 * 3
-    sdY = height / 2
-    sdW = circleW - 70
+    sdImg   = loadImage(nowImg)
+    sdX     = width / 4 * 3
+    sdY     = height / 2
+    sdW     = circleW - 70
     
     ## your actor is Description
     fill(0)
     textSize(32)
-    desc = "[%s], your actor is.." % "TEST"
+    desc    = "[%s], your actor is.." % userName
     textLen = (width / 4 * 3) - int(textWidth(desc) / 2)
     
     rect(width / 4 * 2 + 30, 60, width / 2 - 60, 3)
@@ -142,7 +157,7 @@ def selectMyActor(actor):
     rect(width / 4 * 2 + 30, 120, width / 2 - 60, 3)
     
     ## actor profile
-    fill(actorInfo['bg'])
+    fill(nowBg)
     stroke(0)
     ellipse(sdX, sdY, circleW, circleW)
     
@@ -151,8 +166,4 @@ def selectMyActor(actor):
     ## actor profile name
     textSize(48)
     fill(0)
-    text(actorInfo["name"], width / 4 * 3 - int(textWidth(actorInfo["name"]) / 2), height - 100)
-    
-    ## save My Actor
-    #save("myProfile.jpg")
-    
+    text(nowName, width / 4 * 3 - getTextWidth(nowName) / 2, height - 100)
