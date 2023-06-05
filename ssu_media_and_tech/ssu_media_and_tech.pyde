@@ -12,28 +12,54 @@ selectionNoImageOffsetY = 464
 
 nowName = ""
 
-def transMonth():
-    monthList = {
-        '01': 'January',
-        '02': 'February',
-        '03': 'March',
-        '04': 'April',
-        '05': 'May',
-        '06': 'June',
-        '07': 'July',
-        '08': 'August',
-        '09': 'September',
-        '10': 'October',
-        '11': 'November',
-        '12': 'December'
+# month english
+monthList = {
+    '01': 'January',
+    '02': 'February',
+    '03': 'March',
+    '04': 'April',
+    '05': 'May',
+    '06': 'June',
+    '07': 'July',
+    '08': 'August',
+    '09': 'September',
+    '10': 'October',
+    '11': 'November',
+    '12': 'December'
+}
+
+# actor's SD Image and background color
+actorInfo = {
+    'ganglim': {
+        'name' : 'GANG LIM',
+        'bg'   : '#32283f',
+        'SDImg': './images/icon/SD_ganglim.png'
+    },
+    'haewon': {
+        'name' : 'HAE WON MAC',
+        'bg'   : '#1e231c',
+        'SDImg': './images/icon/SD_haewon.png'
+    },
+    'dukchun': {
+        'name' : 'DUK CHUN',
+        'bg'   : '#42212f',
+        'SDImg': './images/icon/SD_dukchun.png'
+    },
+    'sungjoo': {
+        'name' : 'SUNG JOO SIN',
+        'bg'   : '#462f25',
+        'SDImg': './images/icon/SD_sungjoo.png'
+    },
+    'yumla': {
+        'name' : 'YUM LA KING',
+        'bg'   : '#1e1e38',
+        'SDImg': './images/icon/SD_yumla.png'
     }
-    
-    return monthList
+}
 
 def setup():
-    global img, scrollX, setTime, chInfo, profileBg, profileLeftBg
-    global monthList
-    global clickSave, setTime, boxY, hideSave, saveBtn, saveComplete
+    global img, scrollX, setTime, profileBg, profileLeftBg
+    global clickSave, setTime, boxY, hideSave, saveBtn, saveComplete, saveBtnW, saveBtnH
     
     size(1280, 720)
     
@@ -43,45 +69,12 @@ def setup():
     saveBtn       = loadImage("./images/profile/saveBtn.png")
     saveComplete  = loadImage("./images/profile/saveCompleteInfo.png")
     
-    monthList = transMonth()
-    chInfo    = getCharacterInfo()
-    
     clickSave = False
     setTime   = 0
     boxY      = height
     hideSave  = False
-
-# get actor's SD Image and background color
-def getCharacterInfo():
-    info = {
-        'ganglim': {
-            'name' : 'GANG LIM',
-            'bg'   : '#32283f',
-            'SDImg': './images/icon/SD_ganglim.png'
-        },
-        'haewon': {
-            'name' : 'HAE WON MAC',
-            'bg'   : '#1e231c',
-            'SDImg': './images/icon/SD_haewon.png'
-        },
-        'dukchun': {
-            'name' : 'DUK CHUN',
-            'bg'   : '#42212f',
-            'SDImg': './images/icon/SD_dukchun.png'
-        },
-        'sungjoo': {
-            'name' : 'SUNG JOO SIN',
-            'bg'   : '#462f25',
-            'SDImg': './images/icon/SD_sungjoo.png'
-        },
-        'yumla': {
-            'name' : 'YUM LA KING',
-            'bg'   : '#1e1e38',
-            'SDImg': './images/icon/SD_yumla.png'
-        }
-    }
-    
-    return info
+    saveBtnW  = 206
+    saveBtnH  = 46
 
 ## get text width
 def getTextWidth(word):
@@ -101,11 +94,11 @@ def draw():
 
 # show my actor
 def selectMyActor(actor, userName):
-    global chInfo, profileBg, profileLeftBg
+    global profileBg, profileLeftBg
     global nowTime
     global clickSave, setTime, boxY, hideSave
     
-    if not chInfo[actor]:
+    if not actorInfo[actor]:
         return
     
     nowTime = datetime.now()
@@ -117,11 +110,9 @@ def selectMyActor(actor, userName):
     setMyActorProfile(actor, userName)
     
     if not clickSave:
-        saveW = 206
-        saveH = 46
-        image(saveBtn, width / 4 * 3 - saveW / 2, height - saveH - 30, saveW, saveH)
+        image(saveBtn, width / 4 * 3 - saveBtnW / 2, height - saveBtnH - 30, saveBtnW, saveBtnH)
     else:
-        save("myProfile.jpg")
+        save("myActor.jpg")
         if (setTime <= 50):
             showCompleteSave()
             setTime += 1
@@ -143,13 +134,13 @@ def showCompleteSave():
     if (boxY >= height - (boxHeight + 20) and not hideSave):
         boxY -= 20
     elif setTime >= 35:
-        boxY += 20
         hideSave = True
+        boxY    += 20
 
     image(saveComplete, boxX, boxY, boxWidth, boxHeight)
 
 def setMyActorTicket():
-    global monthList, nowTime
+    global nowTime
     
     ## date time
     posterText = "DATE:\n%s %s\nFREE PASS\nDAY 1\n---\nPLACE EVENT\n%s"
@@ -169,14 +160,9 @@ def setMyActorTicket():
     text("%s %s" % (transMonth, nowTime.strftime("%Y")), 115, height - 115)
     
 def setMyActorProfile(actor, userName):
-    global chInfo
-    global nowName
-    
-    actorInfo = chInfo[actor]
-    
-    nowName = actorInfo["name"]
-    nowImg  = actorInfo["SDImg"]
-    nowBg   = actorInfo["bg"]
+    nowName = actorInfo[actor]["name"]
+    nowImg  = actorInfo[actor]["SDImg"]
+    nowBg   = actorInfo[actor]["bg"]
     
     circleW = 300
     sdImg   = loadImage(nowImg)
@@ -205,6 +191,17 @@ def setMyActorProfile(actor, userName):
     textSize(48)
     fill(0)
     text(nowName, width / 4 * 3 - getTextWidth(nowName) / 2, height - 130)
+
+# save my actor profile image
+def saveMyActorProfile():
+    global clickSave
+    
+    targetX = width / 4 * 3
+    
+    if (mouseX >= targetX - saveBtnW / 2 and mouseY >= height - saveBtnH - 30 and mouseX <= targetX + saveBtnW / 2 and mouseY <= height - 30):
+        clickSave = True
+    else:
+        clickSave = False
     
 def drawQuestions():
     
@@ -284,11 +281,5 @@ def mousePressed():
     didSelectionPressed()
     
 def mouseClicked():
-    global nowName
-    global clickSave
-    
-    if (mouseX >= width / 4 * 3 - getTextWidth(nowName) and mouseY >= height - 100):
-        clickSave = True
-    else:
-        clickSave = False
+    saveMyActorProfile()
     
