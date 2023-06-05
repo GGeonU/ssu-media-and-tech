@@ -33,20 +33,19 @@ def transMonth():
 def setup():
     global img, scrollX, setTime, chInfo, profileBg, profileLeftBg
     global monthList
-    global clickSave, setTime, boxY, hideSave, saveBtn
-
-        
+    global clickSave, setTime, boxY, hideSave, saveBtn, saveComplete
+    
     size(1280, 720)
     
     img           = loadImage("./images/sandStorm.png")
-    profileBg     = loadImage("./images/sandBg.png")
-    profileLeftBg = loadImage("./images/myProfileTicket.png")
-    saveBtn       = loadImage("./images/icon/saveBtnTemp.png")
+    profileBg     = loadImage("./images/profile/sandBg.png")
+    profileLeftBg = loadImage("./images/profile/myProfileTicket.png")
+    saveBtn       = loadImage("./images/profile/saveBtn.png")
+    saveComplete  = loadImage("./images/profile/saveCompleteInfo.png")
     
-    clickSave = False
     monthList = transMonth()
     chInfo    = getCharacterInfo()
-
+    
     clickSave = False
     setTime   = 0
     boxY      = height
@@ -118,13 +117,12 @@ def selectMyActor(actor, userName):
     setMyActorProfile(actor, userName)
     
     if not clickSave:
-        textSize(24)
-        fill(255)
-        text("SAVE", width / 4 * 3 - getTextWidth("SAVE") / 2, height - 40)
+        saveW = 206
+        saveH = 46
+        image(saveBtn, width / 4 * 3 - saveW / 2, height - saveH - 30, saveW, saveH)
     else:
-        clickSave = False
         save("myProfile.jpg")
-        if (setTime <= 60):
+        if (setTime <= 50):
             showCompleteSave()
             setTime += 1
         else:
@@ -135,36 +133,28 @@ def selectMyActor(actor, userName):
 
 ## save complete info box
 def showCompleteSave():
-    global boxY, hideSave, saveBtn
+    global boxY, hideSave, saveComplete
     
-    boxWidth = 400
-    boxHeight = 80
-    boxX = width / 2 - boxWidth / 2
-    saveText = "SAVED!"
+    boxWidth  = 490
+    boxHeight = 60
+    boxX      = width / 2 - boxWidth / 2
+    saveText  = "SAVED!"
 
     if (boxY >= height - (boxHeight + 20) and not hideSave):
         boxY -= 20
-    elif setTime >= 40:
-        hideSave = True
+    elif setTime >= 35:
         boxY += 20
+        hideSave = True
 
-    image(saveBtn, boxX, boxY, boxWidth, boxHeight)
+    image(saveComplete, boxX, boxY, boxWidth, boxHeight)
 
 def setMyActorTicket():
     global monthList, nowTime
     
     ## date time
-    posterText = """
-    DATE:
-    %s %s
-    FREE PASS
-    DAY 1
-    ---
-    PLACE EVENT
-    %s
-    """
-    
+    posterText = "DATE:\n%s %s\nFREE PASS\nDAY 1\n---\nPLACE EVENT\n%s"
     transMonth = monthList[nowTime.strftime("%m")]
+
     if int(nowTime.strftime("%H")) >= 12:
         localeType = "PM"
     else:
@@ -200,21 +190,21 @@ def setMyActorProfile(actor, userName):
     desc    = "[%s], your actor is.." % userName
     textLen = (width / 4 * 3) - int(textWidth(desc) / 2)
     
-    rect(width / 4 * 2 + 30, 60, width / 2 - 60, 3)
+    rect(width / 4 * 2 + 30, 60, width / 2 - 80, 3)
     text(desc, textLen, 100)
-    rect(width / 4 * 2 + 30, 120, width / 2 - 60, 3)
+    rect(width / 4 * 2 + 30, 120, width / 2 - 80, 3)
     
-    ## actor profile
+    ## actor SD Image
     fill(nowBg)
     stroke(0)
     ellipse(sdX, sdY, circleW, circleW)
     
     image(sdImg, sdX - sdW / 2, sdY - sdW / 2, sdW, sdW)
     
-    ## actor profile name
+    ## actor name
     textSize(48)
     fill(0)
-    text(nowName, width / 4 * 3 - getTextWidth(nowName) / 2, height - 100)
+    text(nowName, width / 4 * 3 - getTextWidth(nowName) / 2, height - 130)
     
 def drawQuestions():
     
