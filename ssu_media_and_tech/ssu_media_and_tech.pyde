@@ -31,37 +31,41 @@ monthList = {
 # actor's SD Image and background color
 actorInfo = {
     'ganglim': {
-        'name' : 'GANG LIM',
+        'name' : '강림도령',
         'bg'   : '#32283f',
         'SDImg': './images/icon/SD_ganglim.png'
     },
     'haewon': {
-        'name' : 'HAE WON MAC',
+        'name' : '해원맥',
         'bg'   : '#1e231c',
         'SDImg': './images/icon/SD_haewon.png'
     },
     'dukchun': {
-        'name' : 'DUK CHUN',
+        'name' : '이덕춘',
         'bg'   : '#42212f',
         'SDImg': './images/icon/SD_dukchun.png'
     },
     'sungjoo': {
-        'name' : 'SUNG JOO SIN',
+        'name' : '성주신',
         'bg'   : '#462f25',
         'SDImg': './images/icon/SD_sungjoo.png'
     },
     'yumla': {
-        'name' : 'YUM LA KING',
+        'name' : '염라대왕',
         'bg'   : '#1e1e38',
         'SDImg': './images/icon/SD_yumla.png'
     }
 }
 
 def setup():
+    global font
     global img, scrollX, setTime, profileBg, profileLeftBg
     global clickSave, setTime, boxY, hideSave, saveBtn, saveComplete, saveBtnW, saveBtnH
     
     size(1280, 720)
+    
+    font = createFont("Dialog-48", 32)
+    textFont(font)
     
     img           = loadImage("./images/sandStorm.png")
     profileBg     = loadImage("./images/profile/sandBg.png")
@@ -80,6 +84,9 @@ def setup():
 def getTextWidth(word):
     return int(textWidth(word))
 
+def convertKoreanLang(word):
+    return word.decode('utf-8')
+
 def draw():
     global setTime
     background(255)
@@ -87,7 +94,7 @@ def draw():
     if len(questionSelections) >= 4:
         # show my actor ticket page
         actorNickname = actorBySelections()
-        userName = 'ar.kwon'
+        userName = '권아람'
         selectMyActor(actorNickname, userName)
     else:
         drawQuestions()
@@ -129,7 +136,6 @@ def showCompleteSave():
     boxWidth  = 490
     boxHeight = 60
     boxX      = width / 2 - boxWidth / 2
-    saveText  = "SAVED!"
 
     if (boxY >= height - (boxHeight + 20) and not hideSave):
         boxY -= 20
@@ -160,7 +166,7 @@ def setMyActorTicket():
     text("%s %s" % (transMonth, nowTime.strftime("%Y")), 115, height - 115)
     
 def setMyActorProfile(actor, userName):
-    nowName = actorInfo[actor]["name"]
+    nowName = convertKoreanLang(actorInfo[actor]["name"])
     nowImg  = actorInfo[actor]["SDImg"]
     nowBg   = actorInfo[actor]["bg"]
     
@@ -173,11 +179,11 @@ def setMyActorProfile(actor, userName):
     ## your actor is Description
     fill(0)
     textSize(32)
-    desc    = "[%s], your actor is.." % userName
+    desc = convertKoreanLang("[%s]님과 가장 잘 어울리는 배역은..." % userName)
     textLen = (width / 4 * 3) - int(textWidth(desc) / 2)
     
     rect(width / 4 * 2 + 30, 60, width / 2 - 80, 3)
-    text(desc, textLen, 100)
+    text(desc, textLen, 105)
     rect(width / 4 * 2 + 30, 120, width / 2 - 80, 3)
     
     ## actor SD Image
