@@ -21,17 +21,22 @@ def transMonth():
 def setup():
     global img, scrollX, setTime, chInfo, profileBg, profileLeftBg
     global monthList
-    global clickSave
+    global clickSave, setTime, boxY, hideSave, saveBtn
         
     size(1280, 720)
     
     img           = loadImage("./images/sandStorm.png")
     profileBg     = loadImage("./images/sandBg.png")
     profileLeftBg = loadImage("./images/myProfileTicket.png")
+    saveBtn       = loadImage("./images/icon/saveBtnTemp.png")
     
-    clickSave = False
     monthList = transMonth()
     chInfo    = getCharacterInfo()
+    
+    clickSave = False
+    setTime   = 0
+    boxY      = height
+    hideSave  = False
 
 
 # get actor's SD Image and background color
@@ -75,14 +80,14 @@ def draw():
     background(255)
     
     # show my actor ticket page
-    selectMyActor('ganglim', 'ar.kwon')
+    selectMyActor('dukchun', 'ar.kwon')
 
 
 # show my actor
 def selectMyActor(actor, userName):
     global chInfo, profileBg, profileLeftBg
     global nowTime
-    global clickSave
+    global clickSave, setTime, boxY, hideSave
     
     if not chInfo[actor]:
         return
@@ -100,8 +105,33 @@ def selectMyActor(actor, userName):
         fill(255)
         text("SAVE", width / 4 * 3 - getTextWidth("SAVE") / 2, height - 40)
     else:
-        clickSave = False
         save("myProfile.jpg")
+        if (setTime <= 60):
+            showCompleteSave()
+            setTime += 1
+        else:
+            clickSave = False
+            hideSave  = False
+            boxY      = height
+            setTime   = 0
+
+## save complete info box
+def showCompleteSave():
+    global boxY, hideSave, saveBtn
+    
+    boxWidth = 400
+    boxHeight = 80
+    boxX = width / 2 - boxWidth / 2
+    saveText = "SAVED!"
+
+    if (boxY >= height - (boxHeight + 20) and not hideSave):
+        boxY -= 20
+    elif setTime >= 40:
+        hideSave = True
+        boxY += 20
+
+    image(saveBtn, boxX, boxY, boxWidth, boxHeight)
+
 
 def setMyActorTicket():
     global monthList, nowTime
@@ -133,6 +163,7 @@ def setMyActorTicket():
     
 def setMyActorProfile(actor, userName):
     global chInfo
+    global nowName
     
     actorInfo = chInfo[actor]
     
@@ -167,3 +198,13 @@ def setMyActorProfile(actor, userName):
     textSize(48)
     fill(0)
     text(nowName, width / 4 * 3 - getTextWidth(nowName) / 2, height - 100)
+
+
+def mouseClicked():
+    global nowName
+    global clickSave
+    
+    if (mouseX >= width / 4 * 3 - getTextWidth(nowName) and mouseY >= height - 100):
+        clickSave = True
+    else:
+        clickSave = False
