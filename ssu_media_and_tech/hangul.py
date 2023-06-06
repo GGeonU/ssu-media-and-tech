@@ -275,3 +275,34 @@ def join_jamos(s, ignore_err=True):
     if queue:
         new_string += flush()
     return new_string
+
+def sanitize_jamo(data, newText):
+    if len(data) >= 1:
+        lastText = data[-1]
+        if lastText == "ㅗ".decode('utf-8'):
+            if newText == "ㅏ".decode('utf-8'):
+                return data[:-1] + "ㅘ".decode('utf-8')
+            elif newText == "ㅐ".decode('utf-8'):
+                return data[:-1] + "ㅙ".decode('utf-8')
+            elif newText == "ㅣ".decode('utf-8'):
+                return data[:-1] + "ㅚ".decode('utf-8')
+            else:
+                return data + newText
+        elif lastText == "ㅜ".decode('utf-8'):
+            if newText == "ㅓ".decode('utf-8'):
+                return data[:-1] + "ㅝ".decode('utf-8')
+            elif newText == "ㅔ".decode('utf-8'):
+                return data[:-1] + "ㅞ".decode('utf-8')
+            elif newText == "ㅣ".decode('utf-8'):
+                return data[:-1] + "ㅟ".decode('utf-8')
+            else:
+                return data + newText
+        elif lastText == "ㅡ".decode('utf-8'):
+            if newText == "ㅣ".decode('utf-8'):
+                return data[:-1] + "ㅢ".decode('utf-8')
+            else:
+                return data + newText
+        else:
+            return data + newText
+    else:
+        return data + newText
