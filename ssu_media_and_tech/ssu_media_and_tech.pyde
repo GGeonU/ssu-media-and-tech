@@ -1,4 +1,5 @@
 from datetime import datetime
+import hangul
 
 questionSelections = []
 
@@ -10,7 +11,13 @@ selectionImageHeight = 81
 selectionYesImageOffsetY = 353
 selectionNoImageOffsetY = 464
 
+startButtonMarginTop = 20
+startButtonHeight = 81
+inputBackgroundWidth = 463
+
 nowName = ""
+userName = ""
+isNameRequired = True
 
 # month english
 monthList = {
@@ -90,14 +97,14 @@ def convertKoreanLang(word):
 def draw():
     global setTime
     background(255)
-    
-    if len(questionSelections) >= 4:
-        # show my actor ticket page
-        actorNickname = actorBySelections()
-        userName = '권아람'
-        selectMyActor(actorNickname, userName)
-    else:
+
+    if isNameRequired:
+        drawInputUserName()
+    elif isSelectionRequired():
         drawQuestions()
+    else:
+        actorNickname = actorBySelections()
+        selectMyActor(actorNickname, hangul.join_jamos(userName))
 
 # show my actor
 def selectMyActor(actor, userName):
@@ -179,7 +186,7 @@ def setMyActorProfile(actor, userName):
     ## your actor is Description
     fill(0)
     textSize(32)
-    desc = convertKoreanLang("[%s]님과 가장 잘 어울리는 배역은..." % userName)
+    desc = ("[%s]" % userName) + convertKoreanLang("님과 가장 잘 어울리는 배역은...")
     textLen = (width / 4 * 3) - int(textWidth(desc) / 2)
     
     rect(width / 4 * 2 + 30, 60, width / 2 - 80, 3)
@@ -210,6 +217,8 @@ def saveMyActorProfile():
         clickSave = False
     
 def drawQuestions():
+    imageMode(CORNER)
+    textAlign(LEFT, BASELINE)
     
     # background
     
@@ -282,10 +291,65 @@ def actorBySelections():
                 results.append("ganglim")
             
     return max(results, key=results.count)
-            
+
+def drawInputUserName():
+    
+    startButtonMarginTop = 20
+    startButtonHeight = 81
+    
+    backgroundImage = loadImage("./images/question_background.png")
+    background(backgroundImage)
+    
+    imageMode(CENTER)
+    backgroundNameImage = loadImage("./images/input_name/input_name_background.png")
+    image(backgroundNameImage, width / 2, height / 2)
+    
+    inputNameImage = loadImage("./images/input_name/input_name.png")
+    image(inputNameImage, width / 2, (height / 2) + (startButtonHeight / 2))
+    
+    startButtonImage = loadImage("./images/input_name/start_button_image.png")
+    image(startButtonImage, width / 2, (height / 2) + (startButtonHeight / 2) + startButtonHeight + startButtonMarginTop)
+    
+    textAlign(CENTER, CENTER)
+    font = createFont("Dialog-48", 24)
+    
+    if userName != "":
+        fill(0)
+        text(hangul.join_jamos(userName), width / 2, height / 2 + 35)
+    else:
+        # placeholder
+        fill(224, 224, 224, 224)
+        text(convertKoreanLang("이름을 입력하세요"), width / 2, height / 2 + 35)
+
+def isSelectionRequired():
+    return len(questionSelections) < 4
+
+def didStartButtonPressed():
+    global isNameRequired
+    if (width / 2 - inputBackgroundWidth / 2) <= mouseX <= (width / 2 + inputBackgroundWidth / 2) and ((height / 2) + (startButtonHeight / 2) + startButtonMarginTop + startButtonHeight) - (startButtonHeight / 2) <= mouseY <= ((height / 2) + (startButtonHeight / 2) + startButtonMarginTop + startButtonHeight) + (startButtonHeight / 2):
+        isNameRequired = False
+        
 def mousePressed():
-    didSelectionPressed()
+    if isNameRequired:
+        didStartButtonPressed()
+    elif isSelectionRequired():
+        didSelectionPressed()
     
 def mouseClicked():
     saveMyActorProfile()
     
+def keyPressed():
+    global userName
+    if isNameRequired:
+        if key == BACKSPACE:
+            userName = userName[:-1]
+        else:
+            userName = hangul.sanitize_jamo(userName, key)
+            
+        
+        
+        
+    
+        
+                
+            
