@@ -5,6 +5,9 @@ questionSelections = []
 
 # Constants for UI
 
+mainCharacterImageWidth = 225
+mainCharacterImageHeight = 348
+
 selectionImageOffsetX = 719
 selectionImageWidth = 463
 selectionImageHeight = 81
@@ -18,6 +21,7 @@ inputBackgroundWidth = 463
 nowName = ""
 userName = ""
 isNameRequired = True
+isMain = True
 
 # month english
 monthList = {
@@ -98,7 +102,9 @@ def draw():
     global setTime
     background(255)
 
-    if isNameRequired:
+    if isMain:
+        drawMain()
+    elif isNameRequired:
         drawInputUserName()
     elif isSelectionRequired():
         drawQuestions()
@@ -324,14 +330,33 @@ def drawInputUserName():
 def isSelectionRequired():
     return len(questionSelections) < 4
 
-def didStartButtonPressed():
+def didQuestionStartButtonPressed():
     global isNameRequired
     if (width / 2 - inputBackgroundWidth / 2) <= mouseX <= (width / 2 + inputBackgroundWidth / 2) and ((height / 2) + (startButtonHeight / 2) + startButtonMarginTop + startButtonHeight) - (startButtonHeight / 2) <= mouseY <= ((height / 2) + (startButtonHeight / 2) + startButtonMarginTop + startButtonHeight) + (startButtonHeight / 2):
         isNameRequired = False
         
+def didMainStartButtonPressed():
+    global isMain
+    if (width / 2) - (mainCharacterImageWidth / 2) <= mouseX <= (width / 2) + (mainCharacterImageWidth / 2) and (height / 2) - (mainCharacterImageHeight / 2) <= mouseY <= (height / 2) + (mainCharacterImageHeight / 2):
+        isMain = False
+        
+def drawMain():
+    backgroundMain = loadImage("./images/main/main_background.png") 
+    background(backgroundMain)
+
+    imageMode(CENTER)
+    if (width / 2) - (mainCharacterImageWidth / 2) <= mouseX <= (width / 2) + (mainCharacterImageWidth / 2) and (height / 2) - (mainCharacterImageHeight / 2) <= mouseY <= (height / 2) + (mainCharacterImageHeight / 2):
+        animatedImage = loadImage("./images/main/main_animated_character.png")
+        image(animatedImage, width / 2, height / 2) 
+    else:
+        originalImage = loadImage("./images/main/main_original_character.png")
+        image(originalImage, width / 2, height / 2)
+        
 def mousePressed():
+    if isMain:
+        didMainStartButtonPressed()
     if isNameRequired:
-        didStartButtonPressed()
+        didQuestionStartButtonPressed()
     elif isSelectionRequired():
         didSelectionPressed()
     
@@ -343,7 +368,7 @@ def keyPressed():
     if isNameRequired:
         if key == BACKSPACE:
             userName = userName[:-1]
-        else:
+        elif type(key) is str:
             userName = hangul.sanitize_jamo(userName, key)
             
         
