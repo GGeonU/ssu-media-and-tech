@@ -497,24 +497,18 @@ def stopSoundsAll(sound_list):
         sound.stop()
 
 def mousePressed():
-    if isMain:
-        didMainStartButtonPressed()
-    elif isNameRequired:
-        didQuestionStartButtonPressed()
-    elif isSelectionRequired():
-        didSelectionPressed()
-    
-def mouseClicked():
     global isInformationActor
     global sample_sounds
     global image_x, image_y
     global pageIdx, showNextBtn
     
-    if isInformationActor:
+    if isMain:
+        didMainStartButtonPressed()
+    elif isInformationActor:
         nextBoxW = 490
         nextBoxH = 66
         
-        if showNextBtn :
+        if showNextBtn:
             if (width / 2 - nextBoxW / 2 <= mouseX <= width / 2 + nextBoxW / 2 and height - nextBoxH - 40 <= mouseY <= height - 40):
                 isInformationActor = False
             
@@ -543,7 +537,12 @@ def mouseClicked():
         elif dist(mouseX, mouseY, 532, height / 2) <= 50 and isCuteBg and pageIdx < maxPageIdx:
             pageIdx += 1
             
-            stopSoundsAll(sample_sounds)
+            stopSoundsAll(sample_sounds)    
+    
+    elif isNameRequired:
+        didQuestionStartButtonPressed()
+    elif isSelectionRequired():
+        didSelectionPressed()    
     else:
         saveMyActorProfile()
     
@@ -569,5 +568,5 @@ def keyPressed():
     elif isNameRequired:
         if key == BACKSPACE:
             userName = userName[:-1]
-        elif type(key) is str:
+        else:
             userName = hangul.sanitize_jamo(userName, key)
