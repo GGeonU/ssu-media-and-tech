@@ -8,8 +8,8 @@ questionSelections = []
 # Constants for UI
 
 ###### first page ######
-mainCharacterImageWidth = 225
-mainCharacterImageHeight = 348
+mainCharacterImageWidth = 342
+mainCharacterImageHeight = 417
 
 
 ###### actor information ######
@@ -44,6 +44,7 @@ nowName = ""
 userName = ""
 isNameRequired = True
 isMain = True
+isMainPointerBlink = True
 
 # month english
 monthList = {
@@ -166,6 +167,7 @@ def draw():
     frameRate(30)
 
     if isMain:
+        frameRate(5)
         drawMain()
     elif isInformationActor:
         frameRate(3)
@@ -407,6 +409,8 @@ def didMainStartButtonPressed():
         isMain = False
         
 def drawMain():
+    global isMainPointerBlink
+    
     backgroundMain = loadImage("./images/main/main_background.png") 
     background(backgroundMain)
 
@@ -417,6 +421,13 @@ def drawMain():
     else:
         originalImage = loadImage("./images/main/main_original_character.png")
         image(originalImage, width / 2, height / 2)
+        
+    if isMainPointerBlink:
+        pointerImage = loadImage("./images/main/main_pointer.png")
+        image(pointerImage, (width / 2) - (mainCharacterImageWidth / 2) + 40, (height / 2) + (mainCharacterImageHeight / 2) - 20)
+        isMainPointerBlink = False
+    else:
+        isMainPointerBlink = True
 
 def drawInformationActor():
     imageMode(CENTER)
