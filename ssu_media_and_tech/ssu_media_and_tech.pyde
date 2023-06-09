@@ -1,7 +1,13 @@
+## todo: 
+##      add progressbar
+##      information actor page remove frameRate
+##      change preview video end button
+
 from datetime import datetime
 import hangul
 
 add_library('sound')
+add_library('gifAnimation')
 
 questionSelections = []
 
@@ -10,6 +16,9 @@ questionSelections = []
 ###### first page ######
 mainCharacterImageWidth = 342
 mainCharacterImageHeight = 417
+
+isPreviewVideo = True
+isPreviewSoundPlay = True
 
 
 ###### actor information ######
@@ -99,11 +108,15 @@ def setup():
     global sample_sound, sample_sounds
     global canvasBackgroundImage, canvasCuteBackgroundImage, canvasCuteCloudImage
     global sandStorm, cuteBgX, cuteBgTurn, cursorIcon, cursorBlink, lastStepBtn, nextBoxY, showNextBtn
+    global previewVideo, previewSound
     
     size(1280, 720)
     
     font = createFont("Dialog-48", 32)
     textFont(font)
+    
+    previewVideo = Gif(this, "./images/preview/previewVideo.gif")
+    previewSound = SoundFile(this, "./sounds/previewVideo.mp3")
     
     ### actor information ###
     canvasBackgroundImage     = loadImage("./images/slide/canvas_background.png")
@@ -169,6 +182,8 @@ def draw():
     if isMain:
         frameRate(5)
         drawMain()
+    elif isPreviewVideo:
+        drawPreviewVideo()
     elif isInformationActor:
         frameRate(3)
         drawInformationActor()
@@ -507,14 +522,41 @@ def stopSoundsAll(sound_list):
     for sound in sound_list:
         sound.stop()
 
+# 예고편 재생 
+def drawPreviewVideo():
+    global isPreviewSoundPlay, previewVideo, previewSound
+
+    if isPreviewSoundPlay:
+        previewVideo.play()
+        previewVideo.ignoreRepeat()
+        
+        previewSound.amp(0.2)
+        previewSound.play()
+        
+        isPreviewSoundPlay = False
+    
+    imageMode(CENTER)
+    image(previewVideo, width / 2, height / 2)
+    
+    if not previewVideo.isPlaying():
+        ## 임시 이미지!!
+        tempImg = loadImage("./images/progress/question_progress_empty.png")
+        image(tempImg, width - 250, height - 50)
+
 def mousePressed():
-    global isInformationActor
+    global isInformationActor, isPreviewVideo
     global sample_sounds
     global image_x, image_y
     global pageIdx, showNextBtn
     
+    stopSoundsAll(sample_sounds)
+    
     if isMain:
         didMainStartButtonPressed()
+    elif isPreviewVideo:
+        ### 임시 사이즈 
+        if (width - 481 <= mouseX < width and height - 89 <= mouseY < height):
+            isPreviewVideo = False
     elif isInformationActor:
         nextBoxW = 490
         nextBoxH = 66
@@ -531,7 +573,6 @@ def mousePressed():
                 image(sandStorm, width / 2, height / 2, 1280, 720)
                 globals()["cuteBg{}".format(pageIdx+1)] = True
                 
-                stopSoundsAll(sample_sounds)
                 sample_sounds[pageIdx].play()
                 
                 if pageIdx >= maxPageIdx and not showNextBtn:
@@ -540,15 +581,11 @@ def mousePressed():
         # 왼쪽으로 이동 버튼 클릭 시
         elif dist(mouseX, mouseY, 30, height / 2) <= 50 and pageIdx > 0:
             pageIdx -= 1
-            
-            stopSoundsAll(sample_sounds)
             sample_sounds[pageIdx].play()
         
         # 오른쪽으로 이동 버튼 클릭 시
         elif dist(mouseX, mouseY, 532, height / 2) <= 50 and isCuteBg and pageIdx < maxPageIdx:
-            pageIdx += 1
-            
-            stopSoundsAll(sample_sounds)    
+            pageIdx += 1    
     
     elif isNameRequired:
         didQuestionStartButtonPressed()
