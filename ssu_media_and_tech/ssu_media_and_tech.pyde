@@ -201,6 +201,8 @@ def selectMyActor(actor, userName):
     global nowTime
     global clickSave, setTime, boxY, hideSave
     
+    imageMode(CORNER)
+    
     if not actorInfo[actor]:
         return
     
@@ -339,6 +341,8 @@ def drawQuestions():
     image(selectionYesImage, selectionImageOffsetX, selectionYesImageOffsetY)
     image(selectionNoImage, selectionImageOffsetX, selectionNoImageOffsetY)
     
+    showNavigationProgressBar(3)
+    
 def didSelectionPressed():
     global questionSelections
     if selectionImageOffsetX <= mouseX <= (selectionImageOffsetX + selectionImageWidth):
@@ -409,6 +413,8 @@ def drawInputUserName():
         # placeholder
         fill(224, 224, 224, 224)
         text(convertKoreanLang("이름을 입력하세요"), width / 2, height / 2 + 35)
+    
+    showNavigationProgressBar(3)
 
 def isSelectionRequired():
     return len(questionSelections) < 4
@@ -465,6 +471,8 @@ def drawInformationActor():
             image(imgRight, 532, height / 2, 50, 50)
         else:
             image(imgRightGray, 532, height / 2, 50, 50)
+    
+    showNavigationProgressBar(2)
 
 # 현재 캐릭터 이미지 세팅해주는 함수 
 def slideInformationActorImage(idx):
@@ -525,7 +533,7 @@ def stopSoundsAll(sound_list):
 # 예고편 재생 
 def drawPreviewVideo():
     global isPreviewSoundPlay, previewVideo, previewSound
-
+    
     if isPreviewSoundPlay:
         previewVideo.play()
         previewVideo.ignoreRepeat()
@@ -538,10 +546,18 @@ def drawPreviewVideo():
     imageMode(CENTER)
     image(previewVideo, width / 2, height / 2)
     
+    showNavigationProgressBar(1)
+    
     if not previewVideo.isPlaying():
         ## 임시 이미지!!
         tempImg = loadImage("./images/progress/question_progress_empty.png")
         image(tempImg, width - 250, height - 50)
+
+def showNavigationProgressBar(step):
+    imageMode(CENTER)
+    
+    progressImg = loadImage("./images/navigation/progressbar{}.png".format(step))
+    image(progressImg, width / 2, 30)
 
 def mousePressed():
     global isInformationActor, isPreviewVideo
