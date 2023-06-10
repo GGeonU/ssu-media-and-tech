@@ -1,8 +1,3 @@
-## todo: 
-##      add progressbar
-##      information actor page remove frameRate
-##      change preview video end button
-
 from datetime import datetime
 import hangul
 
@@ -22,8 +17,6 @@ isPreviewSoundPlay = True
 
 
 ###### actor information ######
-add_library('sound')
-
 image_x = 60
 image_y = 180
 
@@ -107,7 +100,8 @@ def setup():
     global imgRight, imgRightGray, imgLeft, imgLeftGray
     global sample_sound, sample_sounds
     global canvasBackgroundImage, canvasCuteBackgroundImage, canvasCuteCloudImage
-    global sandStorm, cuteBgX, cuteBgTurn, cursorIcon, cursorBlink, lastStepBtn, nextBoxY, showNextBtn
+    global sandStorm, sandStormTime, sandStormX, showSandStorm
+    global cuteBgX, cuteBgTurn, cursorIcon, cursorBlink, lastStepBtn, nextBoxY, showNextBtn
     global previewVideo, previewSound
     
     size(1280, 720)
@@ -135,9 +129,12 @@ def setup():
     
     # 큐트버전 구름 이동 변수 세팅 
     cuteBgX    = width / 2
-    cuteBgTurn = 10
+    cuteBgTurn = 5
     
-    sandStorm    = loadImage("./images/slide/sandStorm.png")
+    sandStorm     = loadImage("./images/slide/sandStorm.png")
+    sandStormTime = 0
+    sandStormX    = width / 2
+    showSandStorm = False
     
     imgLeft      = loadImage("./images/slide/left.png")
     imgLeftGray  = loadImage("./images/slide/leftGray.png")
@@ -185,7 +182,6 @@ def draw():
     elif isPreviewVideo:
         drawPreviewVideo()
     elif isInformationActor:
-        frameRate(3)
         drawInformationActor()
     elif isNameRequired:
         drawInputUserName()
@@ -478,6 +474,7 @@ def drawInformationActor():
 def slideInformationActorImage(idx):
     global cuteBgX, cuteBgTurn
     global cursorBlink
+    global sandStormTime, showSandStorm, sandStormX, showNextBtn
     
     idx += 1
     
@@ -504,9 +501,24 @@ def slideInformationActorImage(idx):
         # 이미지 클릭 버튼 깜빡임 효과 
         if cursorBlink:
             image(cursorIcon, 400, height - 200)
-            cursorBlink = False
-        else:
-            cursorBlink = True
+            if frameCount % 20 == 0:
+                cursorBlink = False
+        elif frameCount % 20 == 0:
+                cursorBlink = True
+        
+        # 모래바람 노출 
+        if showSandStorm:
+            if sandStormTime <= 30:
+                sandStormX += 5 
+                image(sandStorm, sandStormX, height / 2, 1920, 1080)
+                sandStormTime += 1
+            else:
+                showSandStorm = False
+                sandStormTime = 0
+                
+                globals()["cuteBg{}".format(idx)] = True
+                        
+                sample_sounds[pageIdx].play()
     
     if showNextBtn:
         showNextPageBtn()
@@ -549,9 +561,8 @@ def drawPreviewVideo():
     showNavigationProgressBar(1)
     
     if not previewVideo.isPlaying():
-        ## 임시 이미지!!
-        tempImg = loadImage("./images/progress/question_progress_empty.png")
-        image(tempImg, width - 250, height - 50)
+        startBtnImg = loadImage("./images/preview/promotionStartBtn.png")
+        image(startBtnImg, width / 2, height - 140)
 
 def showNavigationProgressBar(step):
     imageMode(CENTER)
@@ -564,20 +575,23 @@ def mousePressed():
     global sample_sounds
     global image_x, image_y
     global pageIdx, showNextBtn
+    global sandStormX, showSandStorm
     
     stopSoundsAll(sample_sounds)
     
     if isMain:
         didMainStartButtonPressed()
     elif isPreviewVideo:
-        ### 임시 사이즈 
-        if (width - 481 <= mouseX < width and height - 89 <= mouseY < height):
-            isPreviewVideo = False
-    elif isInformationActor:
-        nextBoxW = 490
-        nextBoxH = 66
+        startBtnW = 374
+        startBtnH = 90
         
+        if (width / 2 - startBtnW / 2 <= mouseX <= width / 2 + startBtnW / 2 and height - startBtnH - 50 <= mouseY <= height - 50):
+            isPreviewVideo = False
+    elif isInformationActor:        
         if showNextBtn:
+            nextBoxW = 490
+            nextBoxH = 66
+
             if (width / 2 - nextBoxW / 2 <= mouseX <= width / 2 + nextBoxW / 2 and height - nextBoxH - 40 <= mouseY <= height - 40):
                 isInformationActor = False
             
@@ -585,11 +599,9 @@ def mousePressed():
     
         # 특정 영역을 클릭했을 때
         if (image_x <= mouseX <= image_x + 428 and image_y <= mouseY <= image_y + 416):
-            if not isCuteBg:
-                image(sandStorm, width / 2, height / 2, 1280, 720)
-                globals()["cuteBg{}".format(pageIdx+1)] = True
-                
-                sample_sounds[pageIdx].play()
+            if not isCuteBg and not showSandStorm:
+                showSandStorm = True
+                sandStormX    = width / 2
                 
                 if pageIdx >= maxPageIdx and not showNextBtn:
                     showNextBtn = True
