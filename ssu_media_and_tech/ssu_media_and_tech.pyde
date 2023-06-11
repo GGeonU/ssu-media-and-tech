@@ -47,6 +47,7 @@ userName = ""
 isNameRequired = True
 isMain = True
 isMainPointerBlink = True
+didPlaySelectedActorSound = False
 
 # month english
 monthList = {
@@ -69,27 +70,32 @@ actorInfo = {
     'ganglim': {
         'name' : '강림도령',
         'bg'   : '#32283f',
-        'SDImg': './images/icon/SD_ganglim.png'
+        'SDImg': './images/icon/SD_ganglim.png',
+        'sound': './sounds/vocal1.mp3'
     },
     'haewon': {
         'name' : '해원맥',
         'bg'   : '#1e231c',
-        'SDImg': './images/icon/SD_haewon.png'
+        'SDImg': './images/icon/SD_haewon.png',
+        'sound': './sounds/vocal2.mp3'
     },
     'dukchun': {
         'name' : '이덕춘',
         'bg'   : '#42212f',
-        'SDImg': './images/icon/SD_dukchun.png'
+        'SDImg': './images/icon/SD_dukchun.png',
+        'sound': './sounds/vocal3.mp3'
     },
     'sungjoo': {
         'name' : '성주신',
         'bg'   : '#462f25',
-        'SDImg': './images/icon/SD_sungjoo.png'
+        'SDImg': './images/icon/SD_sungjoo.png',
+        'sound': './sounds/vocal4.mp3'
     },
     'yumla': {
         'name' : '염라대왕',
         'bg'   : '#1e1e38',
-        'SDImg': './images/icon/SD_yumla.png'
+        'SDImg': './images/icon/SD_yumla.png',
+        'sound': './sounds/vocal5.mp3'
     }
 }
 
@@ -190,7 +196,9 @@ def draw():
     else:
         actorNickname = actorBySelections()
         selectMyActor(actorNickname, hangul.join_jamos(userName))
-
+        if not didPlaySelectedActorSound:
+            playSelectedActorSound(actorNickname)
+            
 # show my actor
 def selectMyActor(actor, userName):
     global profileBg, profileLeftBg
@@ -621,6 +629,14 @@ def mousePressed():
         didSelectionPressed()    
     else:
         saveMyActorProfile()
+        
+        
+def playSelectedActorSound(actorNickname):
+    global didPlaySelectedActorSound
+    didPlaySelectedActorSound = True
+    fileName = actorInfo[actorNickname]["sound"]
+    voiceSound = SoundFile(this, fileName)
+    voiceSound.play()
     
 def keyPressed():
     global userName
