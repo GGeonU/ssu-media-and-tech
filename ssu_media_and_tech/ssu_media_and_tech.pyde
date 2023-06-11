@@ -129,7 +129,7 @@ def setup():
     
     # 큐트버전 구름 이동 변수 세팅 
     cuteBgX    = width / 2
-    cuteBgTurn = 5
+    cuteBgTurn = 3
     
     sandStorm     = loadImage("./images/slide/sandStorm.png")
     sandStormTime = 0
@@ -508,8 +508,8 @@ def slideInformationActorImage(idx):
         
         # 모래바람 노출 
         if showSandStorm:
-            if sandStormTime <= 30:
-                sandStormX += 5 
+            if sandStormTime <= 10:
+                sandStormX += 10
                 image(sandStorm, sandStormX, height / 2, 1920, 1080)
                 sandStormTime += 1
             else:
